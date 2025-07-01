@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Set It Up SB - Speed Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="speedtest.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff;
+      color: #222;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #FF6600;
+      padding: 20px;
+      color: white;
+    }
+    .logo img {
+      max-width: 250px;
+      height: auto;
+    }
+    h1 {
+      font-size: 2em;
+      margin: 0.3em 0 0;
+    }
+    p {
+      font-size: 1em;
+      margin: 0.5em 0;
+    }
+    #startStopBtn {
+      margin: 1em auto;
+      padding: 12px 24px;
+      font-size: 1.2em;
+      background: #FF6600;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #startStopBtn.running {
+      background-color: #cc0000;
+    }
+    .meter {
+      margin: 1.5em auto;
+      max-width: 320px;
+    }
+    canvas {
+      width: 100%;
+    }
+    .results {
+      font-size: 1.1em;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body onload="initUI();">
+
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Set It Up SB Logo" />
+    </div>
+    <h1>Set It Up SB Speed Test</h1>
+    <p>Test your internet speed and performance</p>
+  </header>
+
+  <main>
+    <button id="startStopBtn" onclick="startStop()">Start</button>
+
+    <div class="meter">
+      <h2>Download Speed</h2>
+      <canvas id="dlMeter" height="100"></canvas>
+      <div id="dlText" class="results"></div>
+
+      <h2>Upload Speed</h2>
+      <canvas id="ulMeter" height="100"></canvas>
+      <div id="ulText" class="results"></div>
+
+      <h2>Ping / Jitter</h2>
+      <div id="pingText" class="results"></div>
+      <div id="jitText" class="results"></div>
+    </div>
+  </main>
+
+  <script>
+    var s = new Speedtest();
+    s.setParameter("telemetry_level", "none");
+
+    function I(id) { return document.getElementById(id); }
+    var dlColor = "#FF6600", ulColor = "#FF9900";
+
+    function drawMeter(c, val, color) {
+      var ctx = c.getContext("2d");
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.beginPath();
+      ctx.arc(c.width / 2, c.height / 2, c.height / 2 - 10, 0, 2 * Math.PI);
+      ctx.strokeStyle = "#eee";
+      ctx.lineWidth = 10;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(c.width / 2, c.height / 2, c.height / 2 - 10, -Math.PI / 2, (2 * Math.PI) * val - Math.PI / 2);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 10;
+      ctx.stroke();
+    }
+
+    function format(n) {
+      return (n < 10) ? n.toFixed(2) : n.toFixed(1);
+    }
+
+    function startStop() {
+      if (s.getState() == 3) {
+        s.abort();
+        I("startStopBtn").className = "";
+        return;
+      }
+      I("startStopBtn").className = "running";
+
+      s.onupdate = function(data) {
+        I("dlText").textContent = format(data.dlStatus) + " Mbps";
+        I("ulText").textContent = format(data.ulStatus) + " Mbps";
+        I("pingText").textContent = "Ping: " + format(data.pingStatus) + " ms";
+        I("jitText").textContent = "Jitter: " + format(data.jitterStatus) + " ms";
+
+        drawMeter(I("dlMeter"), Math.min(data.dlStatus / 100, 1), dlColor);
+        drawMeter(I("ulMeter"), Math.min(data.ulStatus / 100, 1), ulColor);
+      };
+      s.onend = function() {
+        I("startStopBtn").className = "";
+      };
+      s.start();
+    }
+
+    function initUI() {
+      drawMeter(I("dlMeter"), 0, dlColor);
+      drawMeter(I("ulMeter"), 0, ulColor);
+    }
+  </script>
+
+</body>
+</html>
