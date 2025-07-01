@@ -1,0 +1,56 @@
+<body onload="initServers()">
+    <div style="text-align:center; margin-top: 1em;">
+        <img src=".logo/Logo.png" alt="Set It Up SB Logo" style="max-width: 200px; height: auto;">
+    </div>
+    <h1 style="color: #FF6600; margin-bottom: 0.25em;">Set It Up SB Speed Test</h1>
+    <p style="color: #555; margin-top: 0;">Measure your current internet speed below.</p>
+
+    <div id="loading" class="visible">
+        <p id="message"><span class="loadCircle"></span>Selecting a server...</p>
+    </div>
+
+    <div id="testWrapper" class="hidden">
+        <div id="startStopBtn" onclick="startStop()"></div><br/>
+        <a class="privacy" href="#" onclick="I('privacyPolicy').style.display=''">Privacy</a>
+        <div id="serverArea">
+            Server: <select id="server" onchange="s.setSelectedServer(SPEEDTEST_SERVERS[this.value])"></select>
+        </div>
+        <div id="test">
+            <div class="testGroup">
+                <div class="testArea2">
+                    <div class="testName">Ping</div>
+                    <div id="pingText" class="meterText" style="color:#FF6600"></div>
+                    <div class="unit">ms</div>
+                </div>
+                <div class="testArea2">
+                    <div class="testName">Jitter</div>
+                    <div id="jitText" class="meterText" style="color:#FF6600"></div>
+                    <div class="unit">ms</div>
+                </div>
+            </div>
+            <div class="testGroup">
+                <div class="testArea">
+                    <div class="testName">Download</div>
+                    <canvas id="dlMeter" class="meter"></canvas>
+                    <div id="dlText" class="meterText"></div>
+                    <div class="unit">Mbit/s</div>
+                </div>
+                <div class="testArea">
+                    <div class="testName">Upload</div>
+                    <canvas id="ulMeter" class="meter"></canvas>
+                    <div id="ulText" class="meterText"></div>
+                    <div class="unit">Mbit/s</div>
+                </div>
+            </div>
+            <div id="ipArea">
+                <span id="ip"></span>
+            </div>
+            <div id="shareArea" style="display:none">
+                <h3>Share results</h3>
+                <p>Test ID: <span id="testId"></span></p>
+                <input type="text" value="" id="resultsURL" readonly="readonly" onclick="this.select();this.focus();this.select();document.execCommand('copy');alert('Link copied')"/>
+                <img src="" id="resultsImg" />
+            </div>
+        </div>
+        <a href="https://github.com/librespeed/speedtest">Powered by LibreSpeed</a>
+    </div>
